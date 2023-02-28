@@ -21,12 +21,69 @@
                     Root.
                 </h1> -->
                 <p
-                    style="font-size: 2vw;
-                    color: darkgreen;"
+                    style="font-size: 2vw; color: darkgreen;"
                 >
-                    Contact joaquin at raisewithroot dot com to learn more
+                    The last investor list you'll ever need
                 </p>
+                <form id="waitlist-form">
+                    <input 
+                        type="email"
+                        name="email"
+                        minlength="6"
+                        maxlength="50"
+                        required
+                        placeholder="youremail@example.com">
+                    <button type="submit">Join the waitlist</button>
+                </form>
             </div>
         </main>
+        <script>
+            const form = document.getElementById("waitlist-form");
+
+            const appendFeedback = msg => {
+                const feedbackParagraphId = "feedback-paragraph";
+                let feedbackParagraph = document.getElementById(feedbackParagraphId);
+                if (!feedbackParagraph) {
+                    feedbackParagraph = document.createElement("p");
+                    feedbackParagraph.id = feedbackParagraphId;
+                    form.parentElement.appendChild(feedbackParagraph);
+                }
+                feedbackParagraph.innerText = msg;
+            }
+
+            const waitlistJoinFailureMsg = "⚠️ Could not join the waitlist. Please try again later";
+            const waitlistJoinSuccessMsg = "You've joined the waitlist ✅";
+            
+            form.addEventListener("submit", async e => {
+                e.preventDefault();
+                let response = await fetch("https://script.google.com/macros/s/AKfycbweVwtJp9pX_nAdwb1o8RdAqUUh9RfzFU-RiR_1wbl5tbXD8-1164B_8XYaM3fTApOKdQ/exec",
+                    {
+                        method: "POST",
+                        body: form.children.email.value,
+                        headers: { "Content-Type": "text/plain"}
+                    })
+                    .catch(err => console.error(err));
+                if (!response || !response.ok) {
+                    appendFeedback(waitlistJoinFailureMsg);
+                    return;
+                }
+                let responseBody = await response.json()
+                    .catch(err => console.error(err));
+                if (!responseBody || !responseBody.success) {
+                    appendFeedback(waitlistJoinFailureMsg);
+                    return;
+                }
+                appendFeedback(waitlistJoinSuccessMsg);
+            });
+        </script>
+        <style>
+            input:not(:placeholder-shown):not(:focus):invalid {
+                border: 2px dashed red;
+            }
+
+            input:valid {
+                border: 2px solid green;
+            }
+        </style>
     </body>
 </html>
